@@ -1,0 +1,21 @@
+{
+    "name": "origin-response",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "coverage": "jest --coverage"
+    },
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "aws-sdk": "^2.1090.0"
+    },
+    "devDependencies": {
+        "@types/jest": "^27.4.1",
+        "aws-sdk-mock": "^5.6.2",
+        "jest": "^27.5.1"
+    }
+}

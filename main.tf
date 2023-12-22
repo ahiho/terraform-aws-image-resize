@@ -3,36 +3,19 @@ terraform {
     aws = {
       source                = "hashicorp/aws"
       version               = ">= 4.48.0"
-      configuration_aliases = [aws.image_origin_region, aws.image_distribution_region]
+      configuration_aliases = [aws.origin_region, aws.distribution_region]
 
     }
   }
 }
 
-module "image_origin" {
-  source = "./modules/image_origin"
-  providers = {
-    aws = aws.image_origin_region
-  }
+provider "aws" {
+  region = var.origin_region
+  alias  = "origin_region"
 
-  image_bucket_name   = var.image_bucket_name
-  image_bucket_region = var.image_bucket_region
 }
 
-module "image_distribution" {
-  source = "./modules/image_distribution"
-  providers = {
-    aws = aws.image_distribution_region
-  }
-
-  origin_access_control_id = module.image_origin.origin_access_control_id
-  origin_id                = module.image_origin.image_bucket_id
-  image_bucket_domain_name = module.image_origin.bucket_domain_name
-
-  image_bucket_name   = var.image_bucket_name
-  image_bucket_region = var.image_bucket_region
-
-  depends_on = [
-    module.image_origin
-  ]
+provider "aws" {
+  region = "us-east-1"
+  alias  = "distribution_region"
 }

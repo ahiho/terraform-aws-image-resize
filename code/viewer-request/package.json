@@ -1,0 +1,26 @@
+{
+    "name": "viewer-request-function",
+    "version": "1.0.0",
+    "description": "AWS Lambda Edge viewer request function",
+    "main": "index.js",
+    "repository": "https://github.com/ahiho/lambda-edge-image-resizer/lambda/viewer-request-function",
+    "author": "Ahiho",
+    "license": "MIT",
+    "scripts": {
+        "build": "tsc",
+        "test": "jest",
+        "coverage": "jest --coverage"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.63",
+        "@types/jest": "^26.0.14",
+        "@types/lodash.clonedeep": "^4.5.6",
+        "@types/node": "^14.11.2",
+        "jest": "^26.4.2",
+        "lodash.clonedeep": "^4.5.0",
+        "ts-jest": "^26.4.1",
+        "ts-node": "^9.0.0",
+        "typescript": "^4.0.3",
+        "querystring": "^0.2.0"
+    }
+}
