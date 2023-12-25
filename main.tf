@@ -10,12 +10,14 @@ terraform {
 }
 
 provider "aws" {
-  region = var.origin_region
-  alias  = "origin_region"
+  allowed_account_ids = ["633674601707"]
+  region              = var.origin_region
+  alias               = "origin_region"
 
 }
 
 provider "aws" {
-  region = "us-east-1"
-  alias  = "distribution_region"
+  allowed_account_ids = ["633674601707"]
+  region              = "us-east-1"
+  alias               = "distribution_region"
 }
