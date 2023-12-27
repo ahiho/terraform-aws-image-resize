@@ -51,7 +51,7 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   role             = aws_iam_role.image_resizing_lambda.arn
   handler          = "index.handler"
   source_code_hash = data.archive_file.image_resizing_lambda_code.output_base64sha256
-  runtime          = "nodejs20.x"
+  runtime          = "nodejs18.x"
   timeout          = 60
   environment {
     variables = {
@@ -59,6 +59,14 @@ resource "aws_lambda_function" "image_resizing_lambda" {
       IMAGE_BUCKET_NAME = var.image_bucket_name
     }
   }
+}
+
+# todo: specify particular cloudfront distribution
+resource "aws_lambda_permission" "image_resizing_lambda" {
+  statement_id  = "AllowExecutionFromCloudFront"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.image_resizing_lambda.function_name
+  principal     = "cloudfront.amazonaws.com"
 }
 
 resource "aws_s3control_object_lambda_access_point" "image_bucket" {

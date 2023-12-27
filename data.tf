@@ -105,12 +105,11 @@ data "aws_iam_policy_document" "s3_object_lambda" {
     resources = [
       aws_s3control_object_lambda_access_point.image_bucket.arn
     ]
-    # condition {
-    #   test     = "StringEquals"
-    #   variable = "aws:SourceArn"
-    #   # todo: need to specify the distribution id
-    #   values = [aws_cloudfront_distribution.image_distribution.arn]
-    # }
+    condition {
+      test     = "StringEquals"
+      variable = "aws:SourceArn"
+      values   = [aws_cloudfront_distribution.image_distribution.arn]
+    }
   }
 
 }
