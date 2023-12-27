@@ -9,7 +9,6 @@ resource "aws_s3_bucket" "image_bucket" {
 
 }
 
-
 resource "aws_s3_bucket_policy" "image_bucket" {
   count    = var.create_new_bucket ? 1 : 0
   provider = aws.origin_region

@@ -54,22 +54,12 @@ data "aws_iam_policy_document" "s3_access_point" {
 # data "aws_iam_policy_document" "image_resizing_lambda" {
 #   # allow cloudfront to call s3 object lambda
 #   statement {
-#     sid    = "Lambda"
-#     effect = "Allow"
-#     principals {
-#       type        = "Service"
-#       identifiers = ["lambda.amazonaws.com"]
-#     }
-#     actions = ["s3:Get*"]
+#     sid     = "S3AccessPoint"
+#     effect  = "Allow"
+#     actions = ["s3:GetObject", "s3:PutObject"]
 #     resources = [
-#       var.create_new_bucket ? aws_s3_bucket.image_bucket[0].arn : "arn:aws:s3:::${var.image_bucket_id}"
+#       var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
 #     ]
-#     # condition {
-#     #   test     = "StringEquals"
-#     #   variable = "aws:SourceArn"
-#     #   # todo: need to specify the distribution id
-#     #   values = [aws_cloudfront_distribution.image_distribution.arn]
-#     # }
 #   }
 
 # }

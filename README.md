@@ -12,6 +12,10 @@
 | quality   | Text        |              | string |
 | height    | Text        |              | int    |
 
+## S3 Path
+
+
+## Lambda function spec
 
 ## References
 - https://aws.amazon.com/blogs/aws/new-use-amazon-s3-object-lambda-with-amazon-cloudfront-to-tailor-content-for-end-users/
