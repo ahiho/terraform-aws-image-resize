@@ -7,6 +7,7 @@ resource "aws_s3_bucket" "image_bucket" {
     Module = "Image Resize"
   }
 
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_policy" "image_bucket" {
@@ -36,10 +37,10 @@ resource "aws_iam_role" "image_resizing_lambda" {
   assume_role_policy  = data.aws_iam_policy_document.assume_image_resizing_lambda.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"]
 
-  # inline_policy {
-  #   name   = "ImageResize"
-  #   policy = data.aws_iam_policy_document.image_resizing_lambda.json
-  # }
+  inline_policy {
+    name   = "ImageResize"
+    policy = data.aws_iam_policy_document.image_resizing_lambda.json
+  }
 }
 
 resource "aws_lambda_function" "image_resizing_lambda" {

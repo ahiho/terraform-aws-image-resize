@@ -51,18 +51,18 @@ data "aws_iam_policy_document" "s3_access_point" {
   }
 }
 
-# data "aws_iam_policy_document" "image_resizing_lambda" {
-#   # allow cloudfront to call s3 object lambda
-#   statement {
-#     sid     = "S3AccessPoint"
-#     effect  = "Allow"
-#     actions = ["s3:GetObject", "s3:PutObject"]
-#     resources = [
-#       var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
-#     ]
-#   }
+data "aws_iam_policy_document" "image_resizing_lambda" {
+  # allow cloudfront to call s3 object lambda
+  statement {
+    sid     = "S3AccessPoint"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:PutObject"]
+    resources = [
+      var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
+    ]
+  }
 
-# }
+}
 
 data "aws_iam_policy_document" "assume_image_resizing_lambda" {
 
@@ -116,8 +116,3 @@ data "aws_iam_policy_document" "viewer_request_lambda_policy" {
   }
 }
 
-data "archive_file" "viewer_request_lambda_code" {
-  type        = "zip"
-  source_dir  = "${path.module}/code/viewer-request/dist/"
-  output_path = "${path.module}/code/vr.zip"
-}
