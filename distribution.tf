@@ -52,12 +52,6 @@ resource "aws_cloudfront_distribution" "image_distribution" {
     target_origin_id = local.object_lambda_access_point_domain_name
 
     cache_policy_id = aws_cloudfront_cache_policy.image_distribution.id
-    lambda_function_association {
-      event_type   = "viewer-request"
-      lambda_arn   = aws_lambda_function.viewer_request.qualified_arn
-      include_body = true
-
-    }
 
     viewer_protocol_policy = "redirect-to-https"
   }
@@ -73,11 +67,6 @@ resource "aws_cloudfront_distribution" "image_distribution" {
     cloudfront_default_certificate = true
   }
 
-  depends_on = [
-    aws_lambda_function.viewer_request,
-    aws_cloudfront_origin_access_control.image_distribution
-  ]
-
   tags = {
     Stack = "Image resizing"
   }
@@ -90,39 +79,4 @@ resource "aws_cloudfront_origin_access_control" "image_distribution" {
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
-}
-
-resource "aws_lambda_function" "viewer_request" {
-  provider = aws.distribution_region
-
-  filename         = data.archive_file.viewer_request_lambda_code.output_path
-  function_name    = "ViewerRequestLambda"
-  role             = aws_iam_role.viewer_request.arn
-  handler          = "index.handler"
-  source_code_hash = data.archive_file.viewer_request_lambda_code.output_base64sha256
-  runtime          = "nodejs20.x"
-  publish          = true
-  timeout          = 5
-
-  tags = {
-    Stack = "Image resizing"
-  }
-
-  depends_on = [
-    aws_iam_role.viewer_request
-  ]
-}
-
-resource "aws_iam_role" "viewer_request" {
-  provider = aws.distribution_region
-
-  name               = "ViewerRequestLambdaRole"
-  assume_role_policy = data.aws_iam_policy_document.viewer_request_lambda_policy.json
-  managed_policy_arns = [
-    "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-  ]
-
-  tags = {
-    Stack = "Image resizing"
-  }
 }

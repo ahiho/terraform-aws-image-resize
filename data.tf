@@ -58,7 +58,8 @@ data "aws_iam_policy_document" "image_resizing_lambda" {
     effect  = "Allow"
     actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
-      var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
+      # var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
+      "${aws_s3_access_point.image_bucket.arn}/*"
     ]
   }
 
