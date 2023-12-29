@@ -46,6 +46,7 @@ resource "aws_iam_role" "image_resizing_lambda" {
 resource "aws_lambda_function" "image_resizing_lambda" {
   provider = aws.origin_region
 
+  architectures    = ["x86_64"]
   filename         = data.archive_file.image_resizing_lambda_code.output_path
   function_name    = "ImageResizingLambda"
   role             = aws_iam_role.image_resizing_lambda.arn
@@ -55,8 +56,10 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   timeout          = 60
   environment {
     variables = {
-      REGION            = var.origin_region
-      IMAGE_BUCKET_NAME = var.image_bucket_name
+      IMAGE_BUCKET_REGION = var.origin_region
+      IMAGE_BUCKET_NAME   = var.image_bucket_name
+      # todo: allow to pass
+      # ROUNDING_VALUE      = var.routing_value
     }
   }
 }

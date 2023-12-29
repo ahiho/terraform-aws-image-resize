@@ -1,8 +1,8 @@
 # Image Origin
 data "archive_file" "image_resizing_lambda_code" {
   type        = "zip"
-  source_dir  = "${path.module}/code/image-resizing/"
-  output_path = "${path.module}/code/ir.zip"
+  source_dir  = "${path.module}/code/image-resize/.aws-sam/build/ImageResize"
+  output_path = "${path.module}/code/ImageResize.zip"
 }
 
 data "aws_iam_policy_document" "s3_bucket" {
@@ -58,7 +58,6 @@ data "aws_iam_policy_document" "image_resizing_lambda" {
     effect  = "Allow"
     actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
-      # var.create_new_bucket ? "${aws_s3_bucket.image_bucket[0].arn}/*" : "arn:aws:s3:::${var.image_bucket_id}/*"
       "${aws_s3_access_point.image_bucket.arn}/*"
     ]
   }

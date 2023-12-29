@@ -1,0 +1,25 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  lambda-nodejs18.x
+
+  Sample SAM Template for lambda-nodejs18.x
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  ImageResize:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      Environment:
+        Variables:
+          IMAGE_BUCKET_REGION: ap-southeast-1
+          IMAGE_BUCKET_NAME: dk-test-image-bucket-wwae9nj6azn698pc4whoq3ifaps1a--ol-s3
+      CodeUri: src/
+      Handler: index.lambdaHandler
+      Runtime: nodejs18.x
+      Architectures:
+        - x86_64

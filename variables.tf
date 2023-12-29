@@ -18,3 +18,10 @@ variable "image_bucket_id" {
   description = "id of existing s3 bucket when create_new_bucket=false"
   nullable    = true
 }
+
+variable "routing_value" {
+  type        = number
+  description = "The rounding value to be used during image resizing"
+  nullable    = true
+  
+}
