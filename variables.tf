@@ -23,5 +23,4 @@ variable "routing_value" {
   type        = number
   description = "The rounding value to be used during image resizing"
   nullable    = true
-  
 }
