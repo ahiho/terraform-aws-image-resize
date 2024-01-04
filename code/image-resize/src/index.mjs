@@ -3,6 +3,7 @@ import { resize } from "./utils/resize.mjs";
 import config from "./utils/config.mjs";
 import { getQuality, getResizeMode, getTransform, limit, roundAndLimit } from "./utils/request.mjs";
 import { DefaultValues as variables, WEBP_EXTENSION } from "./utils/constant.mjs";
+import { log } from "./utils/log.mjs";
 
 const { S3 } = AwsSDK;
 
@@ -29,6 +30,7 @@ export const lambdaHandler = async (event, context) => {
     searchParams.get("original") === "true" || searchParams.get("o") === "true";
 
   if (isRequestOriginalSource) {
+    log('return originalObject');
     try {
       const originalObject = await getObject(s3Url);
       s3.writeGetObjectResponse({
@@ -51,7 +53,6 @@ export const lambdaHandler = async (event, context) => {
   const urlStructure = userRequestPathname.match(/(.*)\/(.*)\.(.*)/) || userRequestPathname.match(/(.*)\.(.*)/);
   const hasPrefix = urlStructure.length > 3;
   const prefix = urlStructure[1];
-  // const imageName = hasPrefix ? urlStructure[2] : urlStructure[1];
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
 
@@ -90,11 +91,13 @@ export const lambdaHandler = async (event, context) => {
     q: requestQuality,
     b: resizeBlur,
   }
+  log('imageProcessParams', imageProcessParams)
 
   const imageProcessParamsEncoded = Buffer.from(JSON.stringify(imageProcessParams)).toString('base64url');
 
   const resizeObjectKey = hasPrefix ? `${prefix}/${imageProcessParamsEncoded}.${extension}` : `${imageProcessParamsEncoded}.${extension}`;
 
+  log('get resizedObject with key', resizeObjectKey)
   const resizedObject = s3.getObject({
     Bucket: config.bucketName,
     Key: resizeObjectKey,
@@ -105,6 +108,7 @@ export const lambdaHandler = async (event, context) => {
     try {
       const originalObject = await getObject(s3Url);
 
+      log('resize originalObject')
       const {
         buffer: resizedImageBuffer,
         contentType,
@@ -117,6 +121,7 @@ export const lambdaHandler = async (event, context) => {
         format: acceptHeader.includes(WEBP_EXTENSION) ? WEBP_EXTENSION : extension,
       })
 
+      log('put resizedObject with key', resizeObjectKey, '& writeGetObjectResponse')
       await Promise.all([
         s3.putObject({
           Bucket: config.bucketName,
@@ -143,6 +148,10 @@ export const lambdaHandler = async (event, context) => {
     }
   }
 
+  log('writeGetObjectResponse', {
+    RequestRoute: requestRoute,
+    RequestToken: requestToken,
+  })
   s3.writeGetObjectResponse({
     RequestRoute: requestRoute,
     RequestToken: requestToken,
@@ -160,9 +169,13 @@ export const lambdaHandler = async (event, context) => {
  * @returns Buffer
  */
 const getObject = async (url) => {
+  log('getObject()', url);
+
   return fetch(url)
     .then(res => {
       if (!res.ok) {
+        log('getObject() !ok', e.message)
+
         throw {
           statusCode: res.status,
           message: res.statusText,
@@ -173,6 +186,8 @@ const getObject = async (url) => {
     })
     .then(arrayBuffer => Buffer.from(arrayBuffer, 'binary'))
     .catch(e => {
+      log('getObject() error', e.message)
+
       throw {
         statusCode: 500,
         message: e.message,

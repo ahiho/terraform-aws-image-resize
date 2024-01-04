@@ -34,6 +34,7 @@ The Lambda function using these environments
 - **IMAGE_BUCKET_REGION** _(required)_: The region where the image bucket is located.
 - **IMAGE_BUCKET_NAME** _(required)_: The name of the image bucket.
 - **ROUNDING_VALUE**: The rounding value to be used during image resizing.
+- **LOG_LEVEL**: The log level of the Lambda function. Valid values are `DEBUG`.
 
 The Lambda function follows a structured workflow to process image resizing:
 
