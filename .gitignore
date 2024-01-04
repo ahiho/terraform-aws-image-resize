@@ -1,5 +1,9 @@
-.terraform
+.terraform/
 .terraform.lock.hcl
 terraform.tfvars
+
+.aws-sam/
+.aws-sam-iacs/
+
 node_modules
 ImageResize.zip

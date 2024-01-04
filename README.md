@@ -3,6 +3,7 @@
 - [Image Resizing Terraform Module](#image-resizing-terraform-module)
   - [Solution Architecture](#solution-architecture)
   - [Installation](#installation)
+    - [Build source code](#build-source-code)
   - [Usage](#usage)
     - [Distribution query parameters](#distribution-query-parameters)
     - [Lambda function spec](#lambda-function-spec)
@@ -14,6 +15,7 @@
 ![alt text](./docs/overview.png)
 
 ## Installation
+### Build source code
 
 ## Usage
 

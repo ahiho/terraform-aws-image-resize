@@ -1,8 +1,8 @@
 # Image Origin
 data "archive_file" "image_resizing_lambda_code" {
   type        = "zip"
-  source_dir  = "${path.module}/code/image-resize/.aws-sam/build/ImageResize"
-  output_path = "${path.module}/code/ImageResize.zip"
+  source_dir  = "${path.module}/.aws-sam/build/ImageResize"
+  output_path = "${path.module}/.aws-sam/build/ImageResize.zip"
 }
 
 data "aws_iam_policy_document" "s3_bucket" {
@@ -39,14 +39,30 @@ data "aws_iam_policy_document" "s3_access_point" {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
     }
+    # todo: need to review
     actions = ["s3:*"]
-    resources = ["${aws_s3_access_point.image_bucket.arn}",
+    resources = [
+      "${aws_s3_access_point.image_bucket.arn}",
       "${aws_s3_access_point.image_bucket.arn}/object/*"
     ]
     condition {
       test     = "ForAnyValue:StringEquals"
       variable = "aws:CalledVia"
       values   = ["s3-object-lambda.amazonaws.com"]
+    }
+  }
+
+  statement {
+    sid     = "ImageResizeLambda"
+    effect  = "Allow"
+    actions = ["s3:GetObject", "s3:PutObject"]
+    resources = [
+      "${aws_s3_access_point.image_bucket.arn}/object/*"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
     }
   }
 }
@@ -58,10 +74,9 @@ data "aws_iam_policy_document" "image_resizing_lambda" {
     effect  = "Allow"
     actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
-      "${aws_s3_access_point.image_bucket.arn}/*"
+      "${aws_s3_access_point.image_bucket.arn}/object/*"
     ]
   }
-
 }
 
 data "aws_iam_policy_document" "assume_image_resizing_lambda" {
@@ -102,17 +117,5 @@ data "aws_iam_policy_document" "s3_object_lambda" {
     }
   }
 
-}
-
-# Image Distribution
-data "aws_iam_policy_document" "viewer_request_lambda_policy" {
-  statement {
-    effect = "Allow"
-    principals {
-      type        = "Service"
-      identifiers = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
-    }
-    actions = ["sts:AssumeRole"]
-  }
 }
 

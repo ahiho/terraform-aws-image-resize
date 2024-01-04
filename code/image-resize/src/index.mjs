@@ -33,11 +33,12 @@ export const lambdaHandler = async (event, context) => {
     log('return originalObject');
     try {
       const originalObject = await getObject(s3Url);
-      s3.writeGetObjectResponse({
+      console.log("originalObject", originalObject);
+      await s3.writeGetObjectResponse({
         RequestRoute: requestRoute,
         RequestToken: requestToken,
         Body: originalObject,
-      })
+      }).promise();
 
       return {
         statusCode: 200,
@@ -57,10 +58,10 @@ export const lambdaHandler = async (event, context) => {
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
 
-  const requestWidth = parseInt(searchParams.get("width") || searchParams.get("w")) || undefined;
-  const requestHeight = parseInt(searchParams.get("height") || searchParams.get("h")) || undefined;
-  const requestTransform = getTransform(searchParams.get("transform") || searchParams.get("t"),);
-  const requestQuality = getQuality(searchParams.get("quality") || searchParams.get("q"));
+  const requestWidth = parseInt(searchParams.get("width")) || undefined;
+  const requestHeight = parseInt(searchParams.get("height")) || undefined;
+  const requestTransform = getTransform(searchParams.get("transform")) || undefined;
+  const requestQuality = getQuality(searchParams.get("quality")) || undefined;
   const requestBlur = parseInt(searchParams.get("blur")) || undefined;
 
   const resizeMode = getResizeMode(
@@ -99,13 +100,18 @@ export const lambdaHandler = async (event, context) => {
   const resizeObjectKey = hasPrefix ? `${prefix}/${imageProcessParamsEncoded}/${imageName}.${extension}` : `${imageProcessParamsEncoded}/${imageName}.${extension}`;
 
   log('get resizedObject with key', resizeObjectKey)
-  const resizedObject = s3.getObject({
+  const resizedObject = await s3.getObject({
     Bucket: config.bucketName,
     Key: resizeObjectKey,
     ResponseContentType: 'arrayBuffer'
-  }).promise()
+  }).promise().catch(e => {
+    log('get resizeObject error', e.message);
+    return null;
+  })
 
-  if (!resizedObject.Body) {
+  console.log("resizedObject", resizedObject);
+
+  if (!resizedObject?.Body) {
     try {
       const originalObject = await getObject(s3Url);
 
@@ -153,11 +159,11 @@ export const lambdaHandler = async (event, context) => {
     RequestRoute: requestRoute,
     RequestToken: requestToken,
   })
-  s3.writeGetObjectResponse({
+  await s3.writeGetObjectResponse({
     RequestRoute: requestRoute,
     RequestToken: requestToken,
     Body: resizedObject.Body,
-  })
+  }).promise();
 
   return {
     statusCode: 200,

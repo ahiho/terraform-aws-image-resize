@@ -57,7 +57,9 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   environment {
     variables = {
       IMAGE_BUCKET_REGION = var.origin_region
-      IMAGE_BUCKET_NAME   = var.image_bucket_name
+      IMAGE_BUCKET_NAME   = aws_s3_access_point.image_bucket.alias
+      LOG_LEVEL           = "DEBUG"
+
       # todo: allow to pass
       # ROUNDING_VALUE      = var.routing_value
     }

@@ -20,16 +20,12 @@ resource "aws_cloudfront_cache_policy" "image_distribution" {
       query_string_behavior = "whitelist"
       query_strings {
         items = [
-          "h",
           "height",
-          "o",
           "original",
-          "q",
           "quality",
-          "t",
           "transform",
-          "w",
           "width",
+          "blur",
         ]
       }
     }
