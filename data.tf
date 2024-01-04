@@ -39,10 +39,8 @@ data "aws_iam_policy_document" "s3_access_point" {
       type        = "Service"
       identifiers = ["cloudfront.amazonaws.com"]
     }
-    # todo: need to review
-    actions = ["s3:*"]
+    actions = ["s3:GetObject", "s3:PutObject"]
     resources = [
-      "${aws_s3_access_point.image_bucket.arn}",
       "${aws_s3_access_point.image_bucket.arn}/object/*"
     ]
     condition {

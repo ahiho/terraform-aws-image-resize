@@ -33,7 +33,7 @@ export const lambdaHandler = async (event, context) => {
     log('return originalObject');
     try {
       const originalObject = await getObject(s3Url);
-      console.log("originalObject", originalObject);
+      log("originalObject", originalObject);
       await s3.writeGetObjectResponse({
         RequestRoute: requestRoute,
         RequestToken: requestToken,
@@ -109,7 +109,7 @@ export const lambdaHandler = async (event, context) => {
     return null;
   })
 
-  console.log("resizedObject", resizedObject);
+  log("resizedObject", resizedObject)
 
   if (!resizedObject?.Body) {
     try {

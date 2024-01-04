@@ -28,6 +28,7 @@
 | quality   | specifies image quality   | low, medium, high, best | string  | high    |
 | height    | specifies image height    | 100, 200,...            | int     |         |
 | original  | get the original image    | true, false             | boolean | false   |
+| blur      | specifies image blur      | 0..50                   | boolean | 0       |
 
 ### Lambda function spec
 
