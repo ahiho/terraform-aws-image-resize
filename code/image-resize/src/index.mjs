@@ -174,7 +174,7 @@ const getObject = async (url) => {
   return fetch(url)
     .then(res => {
       if (!res.ok) {
-        log('getObject() !ok', e.message)
+        log('getObject() !ok')
 
         throw {
           statusCode: res.status,
