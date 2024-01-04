@@ -3,7 +3,6 @@
 - [Image Resizing Terraform Module](#image-resizing-terraform-module)
   - [Solution Architecture](#solution-architecture)
   - [Installation](#installation)
-    - [Build source code](#build-source-code)
   - [Usage](#usage)
     - [Distribution query parameters](#distribution-query-parameters)
     - [Lambda function spec](#lambda-function-spec)
@@ -12,11 +11,21 @@
 
 ## Solution Architecture
 
-![alt text](./docs/overview.png)
+![alt text](./docs/flow.png)
 
 ## Installation
-### Build source code
-
+1. Build source code
+    ```
+      make build
+    ```
+2. Provision Instructions: Copy and paste into your Terraform configuration, insert the variables, and run `terraform init`.
+    ```
+    module "image_resize" {
+      source = "git::https://github.com/ahiho/terraform-aws-image-resize.git?ref=v1.0.0"
+      --- variables ---
+    }
+    ```
+  
 ## Usage
 
 ### Distribution query parameters
@@ -49,6 +58,9 @@ The Lambda function follows a structured workflow to process image resizing:
 6. Returns the resized image.
 
 ### How to test
+1. Get distribution URL from AWS console. Example `https://xxxxxxxxxxxxxx.cloudfront.net`
+2. Put image to S3 bucket. Example `test.png`
+3. Combine distribution URL and image key together. Example `https://xxxxxxxxxxxxxx.cloudfront.net/test.png`
 
 ## References
 
