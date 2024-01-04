@@ -7,3 +7,5 @@ terraform.tfvars
 
 node_modules
 ImageResize.zip
+
+.DS_Store
