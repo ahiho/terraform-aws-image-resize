@@ -53,6 +53,7 @@ export const lambdaHandler = async (event, context) => {
   const urlStructure = userRequestPathname.match(/(.*)\/(.*)\.(.*)/) || userRequestPathname.match(/(.*)\.(.*)/);
   const hasPrefix = urlStructure.length > 3;
   const prefix = urlStructure[1];
+  const imageName = hasPrefix ? urlStructure[2] : urlStructure[1];
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
 
@@ -95,7 +96,7 @@ export const lambdaHandler = async (event, context) => {
 
   const imageProcessParamsEncoded = Buffer.from(JSON.stringify(imageProcessParams)).toString('base64url');
 
-  const resizeObjectKey = hasPrefix ? `${prefix}/${imageProcessParamsEncoded}.${extension}` : `${imageProcessParamsEncoded}.${extension}`;
+  const resizeObjectKey = hasPrefix ? `${prefix}/${imageProcessParamsEncoded}/${imageName}.${extension}` : `${imageProcessParamsEncoded}/${imageName}.${extension}`;
 
   log('get resizedObject with key', resizeObjectKey)
   const resizedObject = s3.getObject({
