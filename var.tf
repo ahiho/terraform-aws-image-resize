@@ -17,6 +17,8 @@ variable "image_bucket_id" {
   type        = string
   description = "id of existing s3 bucket when create_new_bucket=false"
   nullable    = true
+  default     = null
+
 }
 
 variable "routing_value" {
