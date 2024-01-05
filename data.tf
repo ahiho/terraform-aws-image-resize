@@ -1,8 +1,8 @@
 # Image Origin
 data "archive_file" "image_resizing_lambda_code" {
   type        = "zip"
-  source_dir  = "${path.module}/.aws-sam/build/ImageResize"
-  output_path = "${path.module}/.aws-sam/build/ImageResize.zip"
+  source_dir  = "${path.module}/build/ImageResize"
+  output_path = "${path.module}/build/ImageResize.zip"
 }
 
 data "aws_iam_policy_document" "s3_bucket" {
