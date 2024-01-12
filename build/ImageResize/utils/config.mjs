@@ -1,15 +1,15 @@
-const region = process.env.IMAGE_BUCKET_REGION;
-const bucketName = process.env.IMAGE_BUCKET_NAME;
+const region = process.env.BUCKET_REGION;
+const bucketAccessPoint = process.env.BUCKET_ACCESS_POINT;
 const roundingValue = process.env.ROUNDING_VALUE;
 const logLevel = process.env.LOG_LEVEL;
 
-if (!region || !bucketName) {
+if (!region || !bucketAccessPoint) {
   throw new Error('IMAGE_BUCKET_REGION and IMAGE_BUCKET_NAME environment variables are required');
 }
 
 const config = {
   region,
-  bucketName,
+  bucketAccessPoint,
   roundingValue: roundingValue ? Number(roundingValue) : undefined,
   logLevel
 }

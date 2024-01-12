@@ -56,8 +56,8 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   timeout          = 60
   environment {
     variables = {
-      IMAGE_BUCKET_REGION = var.origin_region
-      IMAGE_BUCKET_NAME   = aws_s3_access_point.image_bucket.alias
+      BUCKET_REGION       = var.origin_region
+      BUCKET_ACCESS_POINT = aws_s3_access_point.image_bucket.alias
       LOG_LEVEL           = var.log_level
       ROUNDING_VALUE      = var.rounding_value
     }

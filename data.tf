@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "s3_bucket" {
     condition {
       test     = "StringEquals"
       variable = "s3:DataAccessPointAccount"
-      values   = ["633674601707"] // need to put to env
+      values   = ["633674601707"] # todo: need to put to env
     }
   }
 }

@@ -13,6 +13,7 @@ const { S3 } = AwsSDK;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  */
 export const lambdaHandler = async (event, context) => {
+  console.log("config: ", config);
   const { getObjectContext, userRequest } = event;
 
   const s3 = new S3({
@@ -101,7 +102,7 @@ export const lambdaHandler = async (event, context) => {
 
   log('get resizedObject with key', resizeObjectKey)
   const resizedObject = await s3.getObject({
-    Bucket: config.bucketName,
+    Bucket: config.bucketAccessPoint,
     Key: resizeObjectKey,
     ResponseContentType: 'arrayBuffer'
   }).promise().catch(e => {
@@ -131,7 +132,7 @@ export const lambdaHandler = async (event, context) => {
       log('put resizedObject with key', resizeObjectKey, '& writeGetObjectResponse')
       await Promise.all([
         s3.putObject({
-          Bucket: config.bucketName,
+          Bucket: config.bucketAccessPoint,
           Body: resizedImageBuffer,
           ContentType: contentType,
           CacheControl: 'max-age=31536000',
