@@ -21,7 +21,7 @@ variable "image_bucket_id" {
 
 }
 
-variable "routing_value" {
+variable "rounding_value" {
   type        = string
   description = "The rounding value to be used during image resizing"
   default     = 0
