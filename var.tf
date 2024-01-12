@@ -24,11 +24,11 @@ variable "image_bucket_id" {
 variable "routing_value" {
   type        = string
   description = "The rounding value to be used during image resizing"
-  default     = "INFO"
+  default     = 0
 }
 
 variable "log_level" {
   type        = number
   description = "The rounding value to be used during image resizing"
-  default     = 0
+  default     = "INFO"
 }

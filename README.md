@@ -3,6 +3,8 @@
 - [Image Resizing Terraform Module](#image-resizing-terraform-module)
   - [Solution Architecture](#solution-architecture)
   - [Installation](#installation)
+    - [Install with new bucket](#install-with-new-bucket)
+    - [Install with existing bucket](#install-with-existing-bucket)
   - [Usage](#usage)
     - [Distribution query parameters](#distribution-query-parameters)
     - [Lambda function spec](#lambda-function-spec)
@@ -14,6 +16,7 @@
 ![alt text](./docs/flow.png)
 
 ## Installation
+### Install with new bucket
 1. Build source code
     ```
       make build
@@ -25,7 +28,26 @@
       --- variables ---
     }
     ```
-  
+### Install with existing bucket
+1. Set `create_new_bucket=false`
+2. Make sure that your s3 bucket delegate all needed permissions to s3 access point created by stack. Example: 
+    ```
+      statement {
+      sid    = "AccessPoint"
+      effect = "Allow"
+      principals {
+        type        = "AWS"
+        identifiers = ["*"]
+      }
+      actions = ["*"]
+      resources = [<your s3 bucket ARN>]
+      condition {
+        test     = "StringEquals"
+        variable = "s3:DataAccessPointAccount"
+        values   = [<your account id>]
+      }
+    }
+    ```
 ## Usage
 
 ### Distribution query parameters
