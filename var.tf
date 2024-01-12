@@ -14,13 +14,13 @@ variable "create_new_bucket" {
 }
 
 variable "rounding_value" {
-  type        = string
+  type        = number
   description = "The rounding value to be used during image resizing"
   default     = 0
 }
 
 variable "log_level" {
-  type        = number
+  type        = string
   description = "The rounding value to be used during image resizing"
   default     = "INFO"
 }
