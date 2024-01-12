@@ -5,20 +5,12 @@ variable "origin_region" {
 
 variable "image_bucket_name" {
   type        = string
-  description = "Your image bucket name"
+  description = "Name of bucket will be created or name of existed bucket"
 }
 
 variable "create_new_bucket" {
   type        = bool
   description = "decide to create new s3 bucket to store image or use existing bucket"
-}
-
-variable "image_bucket_id" {
-  type        = string
-  description = "id of existing s3 bucket when create_new_bucket=false"
-  nullable    = true
-  default     = null
-
 }
 
 variable "rounding_value" {

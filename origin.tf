@@ -19,7 +19,7 @@ resource "aws_s3_bucket_policy" "image_bucket" {
 }
 
 resource "aws_s3_access_point" "image_bucket" {
-  bucket   = var.create_new_bucket ? aws_s3_bucket.image_bucket[0].id : var.image_bucket_id
+  bucket   = var.create_new_bucket ? aws_s3_bucket.image_bucket[0].id : var.image_bucket_name
   provider = aws.origin_region
 
   name = var.image_bucket_name
