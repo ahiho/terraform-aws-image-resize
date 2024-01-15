@@ -3,6 +3,7 @@
 - [Image Resizing Terraform Module](#image-resizing-terraform-module)
   - [Solution Architecture](#solution-architecture)
   - [Installation](#installation)
+    - [Requirements providers](#requirements-providers)
     - [Install with new bucket](#install-with-new-bucket)
     - [Install with existing bucket](#install-with-existing-bucket)
   - [Usage](#usage)
@@ -16,6 +17,13 @@
 ![alt text](./docs/flow.png)
 
 ## Installation
+### Requirements providers
+
+| Name                                              | Version          |
+| ------------------------------------------------- | ---------------- |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.31.0, < 6.0 |
+
+
 ### Install with new bucket
 1. Build source code
     ```
@@ -55,9 +63,9 @@
 | Headers   | Description               | Valid Values            | Type    | Default |
 | --------- | ------------------------- | ----------------------- | ------- | ------- |
 | transform | image transformation mode | fit, crop               | string  | crop    |
-| width     | specifies image width     | 100, 200,...            | int     |         |
+| width     | specifies image width     | 100..4100               | int     | 640     |
 | quality   | specifies image quality   | low, medium, high, best | string  | high    |
-| height    | specifies image height    | 100, 200,...            | int     |         |
+| height    | specifies image height    | 100..4100               | int     | 400     |
 | original  | get the original image    | true, false             | boolean | false   |
 | blur      | specifies image blur      | 0..50                   | boolean | 0       |
 
