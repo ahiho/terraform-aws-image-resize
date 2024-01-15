@@ -24,7 +24,7 @@ data "aws_iam_policy_document" "s3_bucket" {
     condition {
       test     = "StringEquals"
       variable = "s3:DataAccessPointAccount"
-      values   = ["633674601707"] # todo: need to put to env
+      values   = [var.account_id]
     }
   }
 }
@@ -89,7 +89,6 @@ data "aws_iam_policy_document" "assume_image_resizing_lambda" {
     }
 
     actions = ["sts:AssumeRole"]
-    # todo: specify particular lambda is allow to assume
   }
 
 }

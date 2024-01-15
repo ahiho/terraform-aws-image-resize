@@ -21,6 +21,12 @@ variable "rounding_value" {
 
 variable "log_level" {
   type        = string
-  description = "The rounding value to be used during image resizing"
+  description = "The log level to be used in lambda function. Valid values [DEBUG]"
   default     = "INFO"
+}
+
+variable "account_id" {
+  type        = string
+  description = "AWS account ID"
+  nullable    = false
 }
