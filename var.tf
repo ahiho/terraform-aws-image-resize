@@ -30,3 +30,14 @@ variable "account_id" {
   description = "AWS account ID"
   nullable    = false
 }
+
+variable "alternative_domain_names" {
+  type        = list(string)
+  description = "Alternative domain names for the CloudFront distribution"
+  default     = []
+}
+
+variable "custom_ssl_cert_arn" {
+  type        = string
+  description = "ARN of the custom SSL certificate to use for the CloudFront distribution"
+}

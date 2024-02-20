@@ -92,9 +92,7 @@ resource "aws_s3control_object_lambda_access_point" "image_bucket" {
 
 }
 
-resource "aws_s3control_object_lambda_access_point_policy" "example" {
+resource "aws_s3control_object_lambda_access_point_policy" "this" {
   name   = aws_s3control_object_lambda_access_point.image_bucket.name
   policy = data.aws_iam_policy_document.s3_object_lambda.json
 }
-
-
