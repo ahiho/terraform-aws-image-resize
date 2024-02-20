@@ -63,7 +63,7 @@ resource "aws_cloudfront_distribution" "image_distribution" {
   aliases = var.alternative_domain_names
 
   viewer_certificate {
-    cloudfront_default_certificate = var.custom_ssl_cert_arn ? false : true
+    cloudfront_default_certificate = var.custom_ssl_cert_arn != "" ? false : true
     acm_certificate_arn            = var.custom_ssl_cert_arn
     ssl_support_method             = "sni-only"
     minimum_protocol_version       = "TLSv1.2_2021"
