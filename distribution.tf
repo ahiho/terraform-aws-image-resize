@@ -3,7 +3,7 @@ locals {
 }
 
 resource "aws_cloudfront_cache_policy" "image_distribution" {
-  name        = "image-distribution"
+  name        = "${var.resource_prefix}ImageDistribution${var.resource_suffix}"
   default_ttl = 50
   max_ttl     = 100
   min_ttl     = 1
@@ -77,7 +77,7 @@ resource "aws_cloudfront_distribution" "image_distribution" {
 resource "aws_cloudfront_origin_access_control" "image_distribution" {
   provider = aws.distribution_region
 
-  name                              = "Image Resize"
+  name                              = "${var.resource_prefix}ImageResize${var.resource_suffix}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"

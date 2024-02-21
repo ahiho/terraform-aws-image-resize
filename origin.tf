@@ -33,7 +33,7 @@ resource "aws_s3control_access_point_policy" "image_bucket" {
 resource "aws_iam_role" "image_resizing_lambda" {
   provider = aws.origin_region
 
-  name                = "ImageResizingLambdaRole"
+  name                = "${var.resource_prefix}ImageResizingLambdaRole${var.resource_suffix}"
   assume_role_policy  = data.aws_iam_policy_document.assume_image_resizing_lambda.json
   managed_policy_arns = ["arn:aws:iam::aws:policy/service-role/AmazonS3ObjectLambdaExecutionRolePolicy"]
 

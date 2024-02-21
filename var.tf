@@ -1,3 +1,14 @@
+variable "resource_prefix" {
+  type        = string
+  description = "The prefix to be used for all resources"
+  nullable    = false
+}
+
+variable "resource_suffix" {
+  type        = string
+  description = "The suffix to be used for all resources"
+}
+
 variable "origin_region" {
   type        = string
   description = "the region of s3 bucket"
