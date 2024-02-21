@@ -7,6 +7,7 @@ variable "resource_prefix" {
 variable "resource_suffix" {
   type        = string
   description = "The suffix to be used for all resources"
+  nullable    = true
 }
 
 variable "origin_region" {
