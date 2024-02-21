@@ -48,7 +48,7 @@ resource "aws_lambda_function" "image_resizing_lambda" {
 
   architectures    = ["x86_64"]
   filename         = data.archive_file.image_resizing_lambda_code.output_path
-  function_name    = "ImageResizingLambda"
+  function_name    = "${var.resource_prefix}ImageResizingLambda${var.resource_suffix}"
   role             = aws_iam_role.image_resizing_lambda.arn
   handler          = "index.lambdaHandler"
   source_code_hash = data.archive_file.image_resizing_lambda_code.output_base64sha256
