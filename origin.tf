@@ -64,12 +64,12 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   }
 }
 
+# todo: specify particular cloudfront distribution
 resource "aws_lambda_permission" "image_resizing_lambda" {
   statement_id  = "AllowExecutionFromCloudFront"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.image_resizing_lambda.function_name
   principal     = "cloudfront.amazonaws.com"
-  source_arn    = aws_cloudfront_distribution.image_distribution.arn
 }
 
 resource "aws_s3control_object_lambda_access_point" "image_bucket" {
