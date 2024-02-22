@@ -53,7 +53,8 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   handler          = "index.lambdaHandler"
   source_code_hash = data.archive_file.image_resizing_lambda_code.output_base64sha256
   runtime          = "nodejs18.x"
-  timeout          = 60
+  timeout          = 6
+  memory_size      = 256
   environment {
     variables = {
       BUCKET_REGION       = var.origin_region
