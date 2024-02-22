@@ -28,7 +28,7 @@ export const lambdaHandler = async (event, context) => {
   const searchParams = new URLSearchParams(urlObject.search);
 
   const isRequestOriginalSource =
-    searchParams.get("original") === "true" || searchParams.get("o") === "true";
+    searchParams.get("o") === "true";
 
   if (isRequestOriginalSource) {
     log('return originalObject');
@@ -59,11 +59,11 @@ export const lambdaHandler = async (event, context) => {
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
 
-  const requestWidth = parseInt(searchParams.get("width")) || undefined;
-  const requestHeight = parseInt(searchParams.get("height")) || undefined;
-  const requestTransform = getTransform(searchParams.get("transform")) || undefined;
-  const requestQuality = getQuality(searchParams.get("quality")) || undefined;
-  const requestBlur = parseInt(searchParams.get("blur")) || undefined;
+  const requestWidth = parseInt(searchParams.get("w")) || undefined;
+  const requestHeight = parseInt(searchParams.get("h")) || undefined;
+  const requestTransform = getTransform(searchParams.get("t")) || undefined;
+  const requestQuality = getQuality(searchParams.get("q")) || undefined;
+  const requestBlur = parseInt(searchParams.get("b")) || undefined;
 
   const resizeMode = getResizeMode(
     requestWidth,

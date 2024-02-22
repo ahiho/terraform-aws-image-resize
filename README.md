@@ -24,21 +24,25 @@
 | <a name="provider_aws"></a> [aws](#provider\_aws) | >= 5.31.0, < 6.0 |
 
 
-### Install with new bucket
-1. Build source code
+### Install with a new bucket
+1. Install AWS SAM CLI
+
+- [Install SAM CLI instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
+
+2. Build source code
     ```
       make build
     ```
-2. Provision Instructions: Copy and paste into your Terraform configuration, insert the variables, and run `terraform init`.
+3. Provision Instructions: Copy and paste into your Terraform configuration, insert the variables, and run `terraform init`.
     ```
     module "image_resize" {
       source = "git::https://github.com/ahiho/terraform-aws-image-resize.git?ref=v1.0.0"
       --- variables ---
     }
     ```
-### Install with existing bucket
+### Install with an existing bucket
 1. Set `create_new_bucket=false`
-2. Make sure that your s3 bucket delegate all needed permissions to s3 access point created by stack. Example: 
+2. Make sure that your s3 bucket delegates all needed permissions to the s3 access point created by this stack. Example: `
     ```
       statement {
       sid    = "AccessPoint"
