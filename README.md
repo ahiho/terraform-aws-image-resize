@@ -27,7 +27,7 @@
 ### Install with a new bucket
 1. Install AWS SAM CLI
 
-- [Install SAM CLI instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
+[Install SAM CLI instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
 
 2. Build source code
     ```
@@ -66,12 +66,12 @@
 
 | Headers   | Description               | Valid Values            | Type    | Default |
 | --------- | ------------------------- | ----------------------- | ------- | ------- |
-| transform | image transformation mode | fit, crop               | string  | crop    |
-| width     | specifies image width     | 100..4100               | int     | 640     |
-| quality   | specifies image quality   | low, medium, high, best | string  | high    |
-| height    | specifies image height    | 100..4100               | int     | 400     |
-| original  | get the original image    | true, false             | boolean | false   |
-| blur      | specifies image blur      | 0..50                   | boolean | 0       |
+| t         | image transformation mode | fit, crop               | string  | crop    |
+| w         | specifies image width     | 100..4100               | int     | 640     |
+| q         | specifies image quality   | low, medium, high, best | string  | high    |
+| h         | specifies image height    | 100..4100               | int     | 400     |
+| o         | get the original image    | true, false             | boolean | false   |
+| b         | specifies image blur      | 0..50                   | boolean | 0       |
 
 ### Lambda function spec
 
