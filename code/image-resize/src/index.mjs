@@ -59,11 +59,11 @@ export const lambdaHandler = async (event, context) => {
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
 
-  const requestWidth = parseInt(searchParams.get("width")) || undefined;
-  const requestHeight = parseInt(searchParams.get("height")) || undefined;
-  const requestTransform = getTransform(searchParams.get("transform")) || undefined;
-  const requestQuality = getQuality(searchParams.get("quality")) || undefined;
-  const requestBlur = parseInt(searchParams.get("blur")) || undefined;
+  const requestWidth = parseInt(searchParams.get("width")) || searchParams.get("w") || undefined;
+  const requestHeight = parseInt(searchParams.get("height")) || searchParams.get("h") || undefined;
+  const requestTransform = getTransform(searchParams.get("transform")) || searchParams.get("t") || undefined;
+  const requestQuality = getQuality(searchParams.get("quality")) || searchParams.get("q") || undefined;
+  const requestBlur = parseInt(searchParams.get("blur")) || searchParams.get("b") || undefined;
 
   const resizeMode = getResizeMode(
     requestWidth,
