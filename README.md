@@ -68,10 +68,11 @@
 | --------- | ------------------------- | ----------------------- | ------- | ------- |
 | t         | image transformation mode | fit, crop               | string  | crop    |
 | w         | specifies image width     | 100..4100               | int     | 640     |
-| q         | specifies image quality   | low, medium, high, best | string  | high    |
 | h         | specifies image height    | 100..4100               | int     | 400     |
 | o         | get the original image    | true, false             | boolean | false   |
 | b         | specifies image blur      | 0..50                   | boolean | 0       |
+| q         | specifies image quality   | low, medium, high, best | string  | high    |
+| -         | -                         | l, m, med, h, b         | -       | -       |
 
 ### Lambda function spec
 
