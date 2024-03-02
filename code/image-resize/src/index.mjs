@@ -2,7 +2,7 @@ import AwsSDK from "aws-sdk";
 import { resize } from "./utils/resize.mjs";
 import config from "./utils/config.mjs";
 import { getQuality, getResizeMode, getTransform, limit, roundAndLimit } from "./utils/request.mjs";
-import { DefaultValues as variables, WEBP_EXTENSION } from "./utils/constant.mjs";
+import { DefaultValues, WEBP_EXTENSION } from "./utils/constant.mjs";
 import { log } from "./utils/log.mjs";
 
 const { S3 } = AwsSDK;
@@ -72,17 +72,15 @@ export const lambdaHandler = async (event, context) => {
   );
 
   const resizeWidth = roundAndLimit(
-    requestWidth || variables.width.default,
-    variables.width.min,
-    variables.width.max,
-    config.roundingValue,
+    requestWidth || DefaultValues.width.default,
+    DefaultValues.width.min,
+    DefaultValues.width.max,
   );
 
   const resizeHeight = roundAndLimit(
-    requestHeight || variables.height.default,
-    variables.height.min,
-    variables.height.max,
-    config.roundingValue,
+    requestHeight || DefaultValues.height.default,
+    DefaultValues.height.min,
+    DefaultValues.height.max,
   );
 
   const resizeBlur = limit(requestBlur, 0, 50)
@@ -111,7 +109,6 @@ export const lambdaHandler = async (event, context) => {
   })
 
   log("resizedObject", resizedObject)
-
   if (!resizedObject?.Body) {
     try {
       const originalObject = await getObject(s3Url);
