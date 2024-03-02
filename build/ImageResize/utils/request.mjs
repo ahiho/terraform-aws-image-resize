@@ -1,9 +1,8 @@
 import {
-  DefaultValues as variables,
-  Transform,
-  Quality,
-  ResizeMode,
+  DefaultValues,
 } from "./constant.mjs";
+
+import { Quality, Transform, ResizeMode } from "./enum.mjs";
 
 /**
  * @param {string} key
@@ -13,7 +12,7 @@ export const getTransform = (key) => {
   if (key === "f" || key === "fit")
     return Transform.Fit;
 
-  return variables.defaults.transform;
+  return DefaultValues.transform;
 };
 
 /**
@@ -33,7 +32,7 @@ export const getQuality = (key) => {
   if (key === "b" || key === "best")
     return Quality.Best;
 
-  return variables.defaults.quality;
+  return DefaultValues.quality;
 };
 
 /**
@@ -66,7 +65,7 @@ export const getResizeMode = (width, height, transform) => {
  * @param {number} roundingValue
  * @returns {number}
  */
-export const roundAndLimit = (value, lowLimit, highLimit, roundingValue = variables.roundToNearest) => {
+export const roundAndLimit = (value, lowLimit, highLimit, roundingValue = DefaultValues.roundToNearest) => {
   const result = Math.round(value / roundingValue) * roundingValue;
 
   if (result < lowLimit)

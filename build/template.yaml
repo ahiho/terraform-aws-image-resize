@@ -12,10 +12,20 @@ Resources:
   ImageResize:
     Type: AWS::Serverless::Function
     Properties:
+      Timeout: 10
       Environment:
         Variables:
-          IMAGE_BUCKET_REGION: ap-southeast-1
-          IMAGE_BUCKET_NAME: dk-test-image-bucket-wwae9nj6azn698pc4whoq3ifaps1a--ol-s3
+          BUCKET_REGION: null
+          BUCKET_ACCESS_POINT: null
+          LOG_LEVEL: null
+          MIN_WIDTH: null
+          MAX_WIDTH: null
+          DEFAULT_WIDTH: null
+          MIN_HEIGHT: null
+          MAX_HEIGHT: null
+          DEFAULT_HEIGHT: null
+          DEFAULT_QUALITY: null
+          DEFAULT_TRANSFORM: null
       CodeUri: ImageResize
       Handler: index.lambdaHandler
       Runtime: nodejs18.x

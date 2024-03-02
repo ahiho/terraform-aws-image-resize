@@ -30,6 +30,54 @@ variable "rounding_value" {
   default     = 0
 }
 
+variable "min_width" {
+  type        = number
+  description = "The minimum width of the image"
+  default     = 100
+}
+
+variable "min_height" {
+  type        = number
+  description = "The minimum height of the image"
+  default     = 100
+}
+
+variable "max_width" {
+  type        = number
+  description = "The maximum width of the image"
+  default     = 4100
+}
+
+variable "max_height" {
+  type        = number
+  description = "The maximum height of the image"
+  default     = 4100
+}
+
+variable "default_width" {
+  type        = number
+  description = "The default width of the image"
+  default     = 100
+}
+
+variable "default_height" {
+  type        = number
+  description = "The default height of the image"
+  default     = 100
+}
+
+variable "default_quality" {
+  type        = string
+  description = "The default quality of the image"
+  default     = "h"
+}
+
+variable "default_transform" {
+  type        = string
+  description = "The default transform of the image"
+  default     = "c"
+}
+
 variable "log_level" {
   type        = string
   description = "The log level to be used in lambda function. Valid values [DEBUG]"
