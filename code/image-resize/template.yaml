@@ -14,10 +14,20 @@ Resources:
   ImageResize:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      Timeout: 10
       Environment:
         Variables:
-          IMAGE_BUCKET_REGION: ap-southeast-1
-          IMAGE_BUCKET_NAME: dk-test-image-bucket-wwae9nj6azn698pc4whoq3ifaps1a--ol-s3
+          BUCKET_REGION:
+          BUCKET_ACCESS_POINT:
+          LOG_LEVEL:
+          MIN_WIDTH:
+          MAX_WIDTH:
+          DEFAULT_WIDTH:
+          MIN_HEIGHT:
+          MAX_HEIGHT:
+          DEFAULT_HEIGHT:
+          DEFAULT_QUALITY:
+          DEFAULT_TRANSFORM:
       CodeUri: src/
       Handler: index.lambdaHandler
       Runtime: nodejs18.x

@@ -82,6 +82,14 @@ The Lambda function using these environments
 - **IMAGE_BUCKET_NAME** _(required)_: The name of the image bucket.
 - **ROUNDING_VALUE**: The rounding value to be used during image resizing.
 - **LOG_LEVEL**: The log level of the Lambda function. Valid values are `DEBUG`.
+- **MIN_WIDTH**: The default min width value
+- **MIN_HEIGHT**: The default min height value
+- **MAX_WIDTH**: The default max width value
+- **MAX_HEIGHT**: The default max width value
+- **DEFAULT_WIDTH**: The default width value
+- **DEFAULT_HEIGHT**: The default height value
+- **DEFAULT_QUALITY**: The default quality value. Valid values are `l`, `m`, `h`, `b`.
+- **DEFAULT_TRANSFORM**: The default width value. Valid values are `f`', `c`.
 
 The Lambda function follows a structured workflow to process image resizing:
 
