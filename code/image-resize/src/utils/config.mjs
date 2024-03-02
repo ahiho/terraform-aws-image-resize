@@ -1,7 +1,5 @@
 import { Quality, Transform } from "./enum.mjs";
 
-console.log('env', process.env)
-
 const region = process.env.BUCKET_REGION;
 const bucketAccessPoint = process.env.BUCKET_ACCESS_POINT;
 
