@@ -112,7 +112,6 @@ export const lambdaHandler = async (event, context) => {
   const resizedObject = await s3.getObject({
     Bucket: config.bucketAccessPoint,
     Key: resizeObjectKey,
-    ResponseContentType: 'arrayBuffer'
   }).promise().catch(e => {
     log('get resizeObject error', e.message);
     return null;
