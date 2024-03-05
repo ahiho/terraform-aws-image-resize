@@ -188,32 +188,35 @@ export const lambdaHandler = async (event, context) => {
  * @returns {Promise<{Body: Buffer, ContentDisposition: string, ContentType: string}>}
  */
 const getObjectFromPresigned = async (url) => {
-  log('getObject()', url);
+  log('getObjectFromPresigned()', url);
 
-  return fetch(url)
-    .then(res => {
-      if (!res.ok) {
-        log('getObject() !ok')
+  try {
+    const res = await fetch(url);
 
-        throw {
-          statusCode: res.status,
-          message: res.statusText,
-        }
-      }
-
-      return {
-        Body: res.arrayBuffer(),
-        ContentDisposition: res.headers.get("content-disposition"),
-        ContentType: res.headers.get("content-type"),
-      };
-    })
-    .then(arrayBuffer => Buffer.from(arrayBuffer, 'binary'))
-    .catch(e => {
-      log('getObject() error', e.message)
+    if (!res.ok) {
+      log('getObjectFromPresigned() !ok')
 
       throw {
-        statusCode: 500,
-        message: e.message,
+        statusCode: res.status,
+        message: res.statusText,
       }
-    })
+    }
+
+    const arrayBuffer = await res.arrayBuffer()
+    const body = Buffer.from(arrayBuffer, 'binary');
+
+
+    return {
+      Body: body,
+      ContentDisposition: res.headers.get("content-disposition"),
+      ContentType: res.headers.get("content-type"),
+    };
+  } catch (e) {
+    log('getObjectFromPresigned() error', e.message)
+
+    throw {
+      statusCode: 500,
+      message: e.message,
+    }
+  }
 };
