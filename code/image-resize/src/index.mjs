@@ -1,7 +1,13 @@
 import AwsSDK from "aws-sdk";
 import { resize } from "./utils/resize.mjs";
 import config from "./utils/config.mjs";
-import { getQuality, getResizeMode, getTransform, limit, roundAndLimit } from "./utils/request.mjs";
+import {
+  getQuality,
+  getResizeMode,
+  getTransform,
+  limit,
+  roundAndLimit,
+} from "./utils/request.mjs";
 import { DefaultValues, WEBP_EXTENSION } from "./utils/constant.mjs";
 import { log } from "./utils/log.mjs";
 
@@ -33,12 +39,14 @@ export const lambdaHandler = async (event, context) => {
   if (isRequestOriginalSource) {
     log('return originalObject');
     try {
-      const originalObject = await getObject(s3Url);
+      const { Body, ContentDisposition, ContentType } = await getObjectFromPresigned(s3Url);
       log("originalObject", originalObject);
       await s3.writeGetObjectResponse({
         RequestRoute: requestRoute,
         RequestToken: requestToken,
-        Body: originalObject,
+        Body,
+        ContentDisposition,
+        ContentType,
       }).promise();
 
       return {
@@ -96,7 +104,9 @@ export const lambdaHandler = async (event, context) => {
 
   const imageProcessParamsEncoded = Buffer.from(JSON.stringify(imageProcessParams)).toString('base64url');
 
-  const resizeObjectKey = hasPrefix ? `${prefix}/${imageProcessParamsEncoded}/${imageName}.${extension}` : `${imageProcessParamsEncoded}/${imageName}.${extension}`;
+  const resizeObjectKey = hasPrefix
+    ? `${prefix}/${imageProcessParamsEncoded}/${imageName}.${extension}`
+    : `${imageProcessParamsEncoded}/${imageName}.${extension}`;
 
   log('get resizedObject with key', resizeObjectKey)
   const resizedObject = await s3.getObject({
@@ -111,20 +121,22 @@ export const lambdaHandler = async (event, context) => {
   log("resizedObject", resizedObject)
   if (!resizedObject?.Body) {
     try {
-      const originalObject = await getObject(s3Url);
+      const originalObject = await getObjectFromPresigned(s3Url);
 
       log('resize originalObject')
-      const {
-        buffer: resizedImageBuffer,
-        contentType,
-      } = await resize(originalObject, {
-        height: resizeHeight,
-        width: resizeWidth,
-        resizeMode: resizeMode,
-        quality: requestQuality,
-        blur: resizeBlur,
-        format: acceptHeader.includes(WEBP_EXTENSION) ? WEBP_EXTENSION : extension,
-      })
+      const { buffer: resizedImageBuffer, contentType } = await resize(
+        originalObject.Body,
+        {
+          height: resizeHeight,
+          width: resizeWidth,
+          resizeMode: resizeMode,
+          quality: requestQuality,
+          blur: resizeBlur,
+          format: acceptHeader.includes(WEBP_EXTENSION)
+            ? WEBP_EXTENSION
+            : extension,
+        },
+      );
 
       log('put resizedObject with key', resizeObjectKey, '& writeGetObjectResponse')
       await Promise.all([
@@ -140,6 +152,8 @@ export const lambdaHandler = async (event, context) => {
           RequestRoute: requestRoute,
           RequestToken: requestToken,
           Body: resizedImageBuffer,
+          ContentDisposition: originalObject.ContentDisposition,
+          ContentType: contentType,
         }).promise()
       ]);
 
@@ -161,19 +175,20 @@ export const lambdaHandler = async (event, context) => {
     RequestRoute: requestRoute,
     RequestToken: requestToken,
     Body: resizedObject.Body,
+    ContentDisposition: resizedObject.ContentDisposition,
+    ContentType: resizedObject.ContentType,
   }).promise();
 
   return {
     statusCode: 200,
   }
-
 };
 
 /**
- * @param {string} url 
- * @returns Buffer
+ * @param {string} url
+ * @returns {Promise<{Body: Buffer, ContentDisposition: string, ContentType: string}>}
  */
-const getObject = async (url) => {
+const getObjectFromPresigned = async (url) => {
   log('getObject()', url);
 
   return fetch(url)
@@ -187,7 +202,11 @@ const getObject = async (url) => {
         }
       }
 
-      return res.arrayBuffer();
+      return {
+        Body: res.arrayBuffer(),
+        ContentDisposition: res.headers.get("content-disposition"),
+        ContentType: res.headers.get("content-type"),
+      };
     })
     .then(arrayBuffer => Buffer.from(arrayBuffer, 'binary'))
     .catch(e => {
