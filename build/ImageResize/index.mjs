@@ -15,10 +15,10 @@ const { S3 } = AwsSDK;
 
 /**
  * @param {Object} event - S3 Object Lambda Access Point event
- * @param {Object} context
+ * @param {Object} _context
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  */
-export const lambdaHandler = async (event, context) => {
+export const lambdaHandler = async (event, _context) => {
   console.log("config: ", config);
   const { getObjectContext, userRequest } = event;
 
@@ -40,7 +40,7 @@ export const lambdaHandler = async (event, context) => {
     log('return originalObject');
     try {
       const { Body, ContentDisposition, ContentType } = await getObjectFromPresigned(s3Url);
-      log("originalObject", originalObject);
+      log("get originalObject success");
       await s3.writeGetObjectResponse({
         RequestRoute: requestRoute,
         RequestToken: requestToken,
