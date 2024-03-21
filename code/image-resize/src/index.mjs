@@ -40,7 +40,7 @@ export const lambdaHandler = async (event, _context) => {
     log('return originalObject');
     try {
       const { Body, ContentDisposition, ContentType } = await getObjectFromPresigned(s3Url);
-      log("originalObject");
+      log("get originalObject success");
       await s3.writeGetObjectResponse({
         RequestRoute: requestRoute,
         RequestToken: requestToken,
