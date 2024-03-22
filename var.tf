@@ -100,3 +100,9 @@ variable "custom_ssl_cert_arn" {
   type        = string
   description = "ARN of the custom SSL certificate to use for the CloudFront distribution"
 }
+
+variable "lambda_memory_size" {
+  type        = number
+  description = "The amount of memory in MB allocated to the Lambda function"
+  default     = 256
+}
