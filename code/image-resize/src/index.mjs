@@ -1,5 +1,5 @@
 import AwsSDK from "aws-sdk";
-import { resize } from "./utils/resize.mjs";
+import { resizePipeline } from "./utils/resize.mjs";
 import config from "./utils/config.mjs";
 import {
   getQuality,
@@ -10,6 +10,7 @@ import {
 } from "./utils/request.mjs";
 import { DefaultValues, WEBP_EXTENSION } from "./utils/constant.mjs";
 import { log } from "./utils/log.mjs";
+import { getObjectFromPresigned, getObjectFromPresignedStream, putS3ObjectStream, writeS3GetObjectResponseStream } from "./utils/s3.mjs";
 
 const { S3 } = AwsSDK;
 
@@ -118,51 +119,58 @@ export const lambdaHandler = async (event, _context) => {
   })
 
   log("resizedObject", resizedObject)
+
   if (!resizedObject?.Body) {
+    console.time("Resize Image");
     try {
-      const originalObject = await getObjectFromPresigned(s3Url);
+      const { readStream, ...meta } = await getObjectFromPresignedStream(s3Url);
 
-      log('resize originalObject')
-      const { buffer: resizedImageBuffer, contentType } = await resize(
-        originalObject.Body,
-        {
-          height: resizeHeight,
-          width: resizeWidth,
-          resizeMode: resizeMode,
-          quality: requestQuality,
-          blur: resizeBlur,
-          format: acceptHeader.includes(WEBP_EXTENSION)
-            ? WEBP_EXTENSION
-            : extension,
-        },
-      );
+      const pipeline = resizePipeline({
+        height: resizeHeight,
+        width: resizeWidth,
+        resizeMode: resizeMode,
+        quality: requestQuality,
+        blur: resizeBlur,
+        format: acceptHeader.includes(WEBP_EXTENSION)
+          ? WEBP_EXTENSION
+          : extension,
+      })
 
-      log('put resizedObject with key', resizeObjectKey, '& writeGetObjectResponse')
+      const { writeStream: writeS3ObjectStream, result: writeS3ObjectResult } = putS3ObjectStream({
+        ContentType: meta.ContentType,
+        CacheControl: 'max-age=31536000',
+        Key: resizeObjectKey,
+        StorageClass: 'STANDARD',
+      })
+
+      const { writeStream: writeS3ObjectResponseStream, result: writeS3ObjectResponseResult } = writeS3GetObjectResponseStream({
+        RequestRoute: requestRoute,
+        RequestToken: requestToken,
+        ContentDisposition: meta.ContentDisposition,
+        ContentType: meta.ContentType,
+      })
+
+      const resizedStream = readStream.pipe(pipeline);
+
+      resizedStream.pipe(writeS3ObjectStream);
+      resizedStream.pipe(writeS3ObjectResponseStream);
+
       await Promise.all([
-        s3.putObject({
-          Bucket: config.bucketAccessPoint,
-          Body: resizedImageBuffer,
-          ContentType: contentType,
-          CacheControl: 'max-age=31536000',
-          Key: resizeObjectKey,
-          StorageClass: 'STANDARD',
-        }).promise(),
-        s3.writeGetObjectResponse({
-          RequestRoute: requestRoute,
-          RequestToken: requestToken,
-          Body: resizedImageBuffer,
-          ContentDisposition: originalObject.ContentDisposition,
-          ContentType: contentType,
-        }).promise()
+        writeS3ObjectResult,
+        writeS3ObjectResponseResult,
       ]);
 
       return {
         statusCode: 200,
       }
     } catch (e) {
+      log('resize object & stream error', e);
+
       return {
         statusCode: e.statusCode,
       }
+    } finally {
+      console.timeEnd("Resize Image");
     }
   }
 
@@ -180,43 +188,5 @@ export const lambdaHandler = async (event, _context) => {
 
   return {
     statusCode: 200,
-  }
-};
-
-/**
- * @param {string} url
- * @returns {Promise<{Body: Buffer, ContentDisposition: string, ContentType: string}>}
- */
-const getObjectFromPresigned = async (url) => {
-  log('getObjectFromPresigned()', url);
-
-  try {
-    const res = await fetch(url);
-
-    if (!res.ok) {
-      log('getObjectFromPresigned() !ok')
-
-      throw {
-        statusCode: res.status,
-        message: res.statusText,
-      }
-    }
-
-    const arrayBuffer = await res.arrayBuffer()
-    const body = Buffer.from(arrayBuffer, 'binary');
-
-
-    return {
-      Body: body,
-      ContentDisposition: res.headers.get("content-disposition"),
-      ContentType: res.headers.get("content-type"),
-    };
-  } catch (e) {
-    log('getObjectFromPresigned() error', e.message)
-
-    throw {
-      statusCode: 500,
-      message: e.message,
-    }
   }
 };
