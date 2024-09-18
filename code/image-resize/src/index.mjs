@@ -8,7 +8,11 @@ import {
   limit,
   roundAndLimit,
 } from "./utils/request.mjs";
-import { DefaultValues, WEBP_EXTENSION } from "./utils/constant.mjs";
+import {
+  DefaultValues,
+  WEBP_EXTENSION,
+  VALID_IMAGE_EXTENSIONS,
+} from "./utils/constant.mjs";
 import { log } from "./utils/log.mjs";
 
 const { S3 } = AwsSDK;
@@ -66,6 +70,23 @@ export const lambdaHandler = async (event, _context) => {
   const imageName = hasPrefix ? urlStructure[2] : urlStructure[1];
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
   const acceptHeader = userRequest.headers['accept']?.[0].value || '';
+  if (!VALID_IMAGE_EXTENSIONS.includes(extension.toLowerCase())) {
+    log("return originalObject - non-image file");
+    const { Body, ContentDisposition, ContentType } =
+      await getObjectFromPresigned(s3Url);
+    await s3
+      .writeGetObjectResponse({
+        RequestRoute: requestRoute,
+        RequestToken: requestToken,
+        Body,
+        ContentDisposition,
+        ContentType,
+      })
+      .promise();
+    return {
+      statusCode: 200,
+    };
+  }
 
   const requestWidth = parseInt(searchParams.get("w")) || undefined;
   const requestHeight = parseInt(searchParams.get("h")) || undefined;
