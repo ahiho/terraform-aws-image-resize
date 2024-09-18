@@ -38,3 +38,5 @@ export const WEBP_EXTENSION = 'webp';
 
 export const PREFIX_FILE_URL_REGEX = /(.*)\/(.*)\.(.*)/;
 export const FILE_URL_REGEX = /(.*)\.(.*)/;
+
+export const VALID_IMAGE_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp']
