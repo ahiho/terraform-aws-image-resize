@@ -28,7 +28,7 @@ export const lambdaHandler = async (event, _context) => {
 
   const s3 = new S3({
     region: config.region,
-  })
+  });
 
   const s3Url = getObjectContext.inputS3Url;
   const requestRoute = getObjectContext.outputRoute;
@@ -37,55 +37,65 @@ export const lambdaHandler = async (event, _context) => {
   const urlObject = new URL(userRequest.url);
   const searchParams = new URLSearchParams(urlObject.search);
 
-  const isRequestOriginalSource =
-    searchParams.get("o") === "true";
+  const isRequestOriginalSource = searchParams.get("o") === "true";
 
   if (isRequestOriginalSource) {
-    log('return originalObject');
+    log("return originalObject");
     try {
-      const { Body, ContentDisposition, ContentType } = await getObjectFromPresigned(s3Url);
+      const { Body, ContentDisposition, ContentType } =
+        await getObjectFromPresigned(s3Url);
       log("get originalObject success");
-      await s3.writeGetObjectResponse({
-        RequestRoute: requestRoute,
-        RequestToken: requestToken,
-        Body,
-        ContentDisposition,
-        ContentType,
-      }).promise();
-
-      return {
-        statusCode: 200,
-      }
+      await s3
+        .writeGetObjectResponse({
+          RequestRoute: requestRoute,
+          RequestToken: requestToken,
+          Body,
+          ContentDisposition,
+          ContentType,
+        })
+        .promise();
     } catch (e) {
-      return {
-        statusCode: e.statusCode,
-      }
+      log("return originalObject error", e)
+      await writeNotFoundResponse(s3, requestRoute, requestToken);
     }
+
+    return {
+      statusCode: 200,
+    };
   }
 
-  const userRequestPathname = urlObject.pathname.replace(/^\//, '');
-  const urlStructure = userRequestPathname.match(/(.*)\/(.*)\.(.*)/) || userRequestPathname.match(/(.*)\.(.*)/);
+  const userRequestPathname = urlObject.pathname.replace(/^\//, "");
+  const urlStructure =
+    userRequestPathname.match(/(.*)\/(.*)\.(.*)/) ||
+    userRequestPathname.match(/(.*)\.(.*)/);
   const hasPrefix = urlStructure.length > 3;
   const prefix = urlStructure[1];
   const imageName = hasPrefix ? urlStructure[2] : urlStructure[1];
   const extension = hasPrefix ? urlStructure[3] : urlStructure[2];
-  const acceptHeader = userRequest.headers['accept']?.[0].value || '';
+  const acceptHeader = userRequest.headers["accept"]?.[0].value || "";
+
   if (!VALID_IMAGE_EXTENSIONS.includes(extension.toLowerCase())) {
     log("return originalObject - non-image file");
-    const { Body, ContentDisposition, ContentType } =
-      await getObjectFromPresigned(s3Url);
-    await s3
-      .writeGetObjectResponse({
-        RequestRoute: requestRoute,
-        RequestToken: requestToken,
-        Body,
-        ContentDisposition,
-        ContentType,
-      })
-      .promise();
-    return {
-      statusCode: 200,
-    };
+    try {
+      const { Body, ContentDisposition, ContentType } =
+        await getObjectFromPresigned(s3Url);
+      await s3
+        .writeGetObjectResponse({
+          RequestRoute: requestRoute,
+          RequestToken: requestToken,
+          Body,
+          ContentDisposition,
+          ContentType,
+        })
+        .promise();
+    } catch (e) {
+      log("return originalObject error", e);
+      await writeNotFoundResponse(s3, requestRoute, requestToken);
+
+      return {
+        statusCode: 200,
+      };
+    }
   }
 
   const requestWidth = parseInt(searchParams.get("w")) || undefined;
@@ -112,7 +122,7 @@ export const lambdaHandler = async (event, _context) => {
     DefaultValues.height.max,
   );
 
-  const resizeBlur = limit(requestBlur, 0, 50)
+  const resizeBlur = limit(requestBlur, 0, 50);
 
   const imageProcessParams = {
     w: resizeWidth,
@@ -120,30 +130,35 @@ export const lambdaHandler = async (event, _context) => {
     m: resizeMode,
     q: requestQuality,
     b: resizeBlur,
-  }
-  log('imageProcessParams', imageProcessParams)
+  };
+  log("imageProcessParams", imageProcessParams);
 
-  const imageProcessParamsEncoded = Buffer.from(JSON.stringify(imageProcessParams)).toString('base64url');
+  const imageProcessParamsEncoded = Buffer.from(
+    JSON.stringify(imageProcessParams),
+  ).toString("base64url");
 
   const resizeObjectKey = hasPrefix
     ? `${prefix}/${imageProcessParamsEncoded}/${imageName}.${extension}`
     : `${imageProcessParamsEncoded}/${imageName}.${extension}`;
 
-  log('get resizedObject with key', resizeObjectKey)
-  const resizedObject = await s3.getObject({
-    Bucket: config.bucketAccessPoint,
-    Key: resizeObjectKey,
-  }).promise().catch(e => {
-    log('get resizeObject error', e.message);
-    return null;
-  })
+  log("get resizedObject with key", resizeObjectKey);
+  const resizedObject = await s3
+    .getObject({
+      Bucket: config.bucketAccessPoint,
+      Key: resizeObjectKey,
+    })
+    .promise()
+    .catch((e) => {
+      log("get resizeObject error", e.message);
+      return null;
+    });
 
-  log("resizedObject", resizedObject)
+  log("resizedObject", resizedObject);
   if (!resizedObject?.Body) {
     try {
       const originalObject = await getObjectFromPresigned(s3Url);
 
-      log('resize originalObject')
+      log("resize originalObject");
       const { buffer: resizedImageBuffer, contentType } = await resize(
         originalObject.Body,
         {
@@ -158,50 +173,59 @@ export const lambdaHandler = async (event, _context) => {
         },
       );
 
-      log('put resizedObject with key', resizeObjectKey, '& writeGetObjectResponse')
+      log(
+        "put resizedObject with key",
+        resizeObjectKey,
+        "& writeGetObjectResponse",
+      );
       await Promise.all([
-        s3.putObject({
-          Bucket: config.bucketAccessPoint,
-          Body: resizedImageBuffer,
-          ContentType: contentType,
-          CacheControl: 'max-age=31536000',
-          Key: resizeObjectKey,
-          StorageClass: 'STANDARD',
-        }).promise(),
-        s3.writeGetObjectResponse({
-          RequestRoute: requestRoute,
-          RequestToken: requestToken,
-          Body: resizedImageBuffer,
-          ContentDisposition: originalObject.ContentDisposition,
-          ContentType: contentType,
-        }).promise()
+        s3
+          .putObject({
+            Bucket: config.bucketAccessPoint,
+            Body: resizedImageBuffer,
+            ContentType: contentType,
+            CacheControl: "max-age=31536000",
+            Key: resizeObjectKey,
+            StorageClass: "STANDARD",
+          })
+          .promise(),
+        s3
+          .writeGetObjectResponse({
+            RequestRoute: requestRoute,
+            RequestToken: requestToken,
+            Body: resizedImageBuffer,
+            ContentDisposition: originalObject.ContentDisposition,
+            ContentType: contentType,
+          })
+          .promise(),
       ]);
-
-      return {
-        statusCode: 200,
-      }
     } catch (e) {
-      return {
-        statusCode: e.statusCode,
-      }
+      log("put resizedObject & writeObject error", e)
+      await writeNotFoundResponse(s3, requestRoute, requestToken)
     }
+
+    return {
+      statusCode: 200,
+    };
   }
 
-  log('writeGetObjectResponse', {
+  log("writeGetObjectResponse", {
     RequestRoute: requestRoute,
     RequestToken: requestToken,
-  })
-  await s3.writeGetObjectResponse({
-    RequestRoute: requestRoute,
-    RequestToken: requestToken,
-    Body: resizedObject.Body,
-    ContentDisposition: resizedObject.ContentDisposition,
-    ContentType: resizedObject.ContentType,
-  }).promise();
+  });
+  await s3
+    .writeGetObjectResponse({
+      RequestRoute: requestRoute,
+      RequestToken: requestToken,
+      Body: resizedObject.Body,
+      ContentDisposition: resizedObject.ContentDisposition,
+      ContentType: resizedObject.ContentType,
+    })
+    .promise();
 
   return {
     statusCode: 200,
-  }
+  };
 };
 
 /**
@@ -209,23 +233,22 @@ export const lambdaHandler = async (event, _context) => {
  * @returns {Promise<{Body: Buffer, ContentDisposition: string, ContentType: string}>}
  */
 const getObjectFromPresigned = async (url) => {
-  log('getObjectFromPresigned()', url);
+  log("getObjectFromPresigned()", url);
 
   try {
     const res = await fetch(url);
 
     if (!res.ok) {
-      log('getObjectFromPresigned() !ok')
+      log("getObjectFromPresigned() !ok");
 
       throw {
         statusCode: res.status,
         message: res.statusText,
-      }
+      };
     }
 
-    const arrayBuffer = await res.arrayBuffer()
-    const body = Buffer.from(arrayBuffer, 'binary');
-
+    const arrayBuffer = await res.arrayBuffer();
+    const body = Buffer.from(arrayBuffer, "binary");
 
     return {
       Body: body,
@@ -233,11 +256,29 @@ const getObjectFromPresigned = async (url) => {
       ContentType: res.headers.get("content-type"),
     };
   } catch (e) {
-    log('getObjectFromPresigned() error', e.message)
+    log("getObjectFromPresigned() error", e.message);
 
     throw {
       statusCode: 500,
       message: e.message,
-    }
+    };
   }
 };
+
+/**
+ * @param {S3} s3
+ * @param {string} requestRoute
+ * @param {string} requestToken
+ */
+const writeNotFoundResponse = async (s3, requestRoute, requestToken) => {
+  await s3
+    .writeGetObjectResponse({
+      RequestRoute: requestRoute,
+      RequestToken: requestToken,
+      StatusCode: 404,
+      ErrorCode: "NotFound",
+      ErrorMessage: "Object Not Found",
+    })
+    .promise();
+};
+
