@@ -1,2 +1,2 @@
 b:
-	sam build --beta-features -t ./src/image-resize/template.yaml -b ./build
+	sam build --beta-features -t ./code/image-resize/template.yaml -b ./build
