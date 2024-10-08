@@ -50,9 +50,9 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   filename         = data.archive_file.image_resizing_lambda_code.output_path
   function_name    = "${var.resource_prefix}ImageResizingLambda${var.resource_suffix}"
   role             = aws_iam_role.image_resizing_lambda.arn
-  handler          = "index.lambdaHandler"
+  handler          = "bootstrap"
   source_code_hash = data.archive_file.image_resizing_lambda_code.output_base64sha256
-  runtime          = "nodejs18.x"
+  runtime          = "provided.al2023"
   timeout          = 6
   memory_size      = var.lambda_memory_size
   environment {

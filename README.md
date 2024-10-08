@@ -30,9 +30,14 @@
 [Install SAM CLI instructions](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/install-sam-cli.html#install-sam-cli-instructions)
 
 2. Build source code
+
     ```
-      make build
+      make b
     ```
+
+> [!NOTE]  
+> Cargo is required since building using a Docker container is not supported for now. https://github.com/aws/aws-sam-cli/issues/7261
+
 3. Provision Instructions: Copy and paste into your Terraform configuration, insert the variables, and run `terraform init`.
     ```
     module "image_resize" {
