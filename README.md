@@ -86,7 +86,7 @@ The Lambda function using these environments
 - **IMAGE_BUCKET_REGION** _(required)_: The region where the image bucket is located.
 - **IMAGE_BUCKET_NAME** _(required)_: The name of the image bucket.
 - **ROUNDING_VALUE**: The rounding value to be used during image resizing.
-- **LOG_LEVEL**: The log level of the Lambda function. Valid values are `DEBUG`.
+- **LOG_LEVEL**: The log level of the Lambda function. Valid values are `ERROR`, `INFO`, `DEBUG`, `TRACE`.
 - **MIN_WIDTH**: The default min width value
 - **MIN_HEIGHT**: The default min height value
 - **MAX_WIDTH**: The default max width value

@@ -57,18 +57,18 @@ resource "aws_lambda_function" "image_resizing_lambda" {
   memory_size      = var.lambda_memory_size
   environment {
     variables = {
-      BUCKET_REGION       = var.origin_region
-      BUCKET_ACCESS_POINT = aws_s3_access_point.image_bucket.alias
-      LOG_LEVEL           = var.log_level
-      ROUNDING_VALUE      = var.rounding_value
-      MIN_WIDTH           = var.min_width
-      MIN_HEIGHT          = var.min_height
-      MAX_WIDTH           = var.max_width
-      MAX_HEIGHT          = var.max_height
-      DEFAULT_WIDTH       = var.default_width
-      DEFAULT_HEIGHT      = var.default_height
-      DEFAULT_QUALITY     = var.default_quality
-      DEFAULT_TRANSFORM   = var.default_transform
+      BUCKET_REGION        = var.origin_region
+      BUCKET_ACCESS_POINT  = aws_s3_access_point.image_bucket.alias
+      ROUNDING_VALUE       = var.rounding_value
+      MIN_WIDTH            = var.min_width
+      MIN_HEIGHT           = var.min_height
+      MAX_WIDTH            = var.max_width
+      MAX_HEIGHT           = var.max_height
+      DEFAULT_WIDTH        = var.default_width
+      DEFAULT_HEIGHT       = var.default_height
+      DEFAULT_QUALITY      = var.default_quality
+      DEFAULT_TRANSFORM    = var.default_transform
+      AWS_LAMBDA_LOG_LEVEL = var.log_level
     }
   }
 }
