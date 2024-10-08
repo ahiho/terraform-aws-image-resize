@@ -3,7 +3,7 @@ use std::path::Path;
 use base64::Engine;
 use lambda_runtime::tracing;
 use regex::Regex;
-use resize::{ImageQuality, ResizeParams};
+use resize::ResizeParams;
 use serde::{Deserialize, Serialize};
 use url::Url;
 
@@ -14,7 +14,7 @@ pub struct ImageProcessParams {
     w: u32,
     h: u32,
     m: String,
-    q: ImageQuality,
+    q: String,
     b: u32,
 }
 
@@ -67,7 +67,7 @@ pub fn get_resized_image_key(url: &str, params: &ResizeParams) -> String {
         w: params.w,
         h: params.h.unwrap_or(CONFIG.default_height),
         m: params.t.to_string(),
-        q: params.q.clone(),
+        q: params.q.to_string(),
         b: params.b,
     };
 

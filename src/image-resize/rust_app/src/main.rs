@@ -89,6 +89,8 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
         .await
     {
         Ok((image, ct)) => {
+            tracing::info!("Retrieved resized image");
+
             return client
                 .send_file(
                     route,

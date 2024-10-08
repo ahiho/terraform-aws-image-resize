@@ -223,6 +223,8 @@ fn resize_multi_pages(
     height: u32,
     transform: TransformMode,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    tracing::info!("Resizing multi pages image: {}, {}", width, height);
+
     let resized_img = match transform {
         TransformMode::Fit => {
             img.resize_to_fill(width, height, image::imageops::FilterType::Lanczos3)
