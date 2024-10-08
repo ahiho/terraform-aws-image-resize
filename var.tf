@@ -75,12 +75,12 @@ variable "default_quality" {
 variable "default_transform" {
   type        = string
   description = "The default transform of the image"
-  default     = "c"
+  default     = "f"
 }
 
 variable "log_level" {
   type        = string
-  description = "The log level to be used in lambda function. Valid values [DEBUG]"
+  description = "The log level to be used in lambda function. Valid values [ERROR,INFO,DEBUG,TRACE]"
   default     = "INFO"
 }
 
