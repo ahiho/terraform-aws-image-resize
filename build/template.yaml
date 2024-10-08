@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Image resize Lambda function
+Globals:
+  Function:
+    Timeout: 3
+Resources:
+  ImageResize:
+    Type: AWS::Serverless::Function
+    Metadata:
+      BuildMethod: rust-cargolambda
+      SamResourceId: ImageResize
+    Properties:
+      Runtime: provided.al2023
+      Handler: bootstrap
+      Timeout: 10
+      CodeUri: ImageResize
+      Architectures:
+      - x86_64
