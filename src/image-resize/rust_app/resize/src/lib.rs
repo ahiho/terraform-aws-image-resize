@@ -207,7 +207,7 @@ pub fn resize_image(
     };
 
     match format {
-        ImageFormat::Gif => return resize_multi_pages(img, params.w, height, params.t),
+        ImageFormat::Gif => return resize_multi_pages(img, params.w, img_height, params.t),
         _ => {
             return resize_single_page(
                 img, format, params.w, img_height, params.t, params.b, params.q,
@@ -216,6 +216,7 @@ pub fn resize_image(
     }
 }
 
+// TODO: Fix multi pages image handling
 fn resize_multi_pages(
     img: DynamicImage,
     width: u32,
