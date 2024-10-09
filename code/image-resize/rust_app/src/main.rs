@@ -22,15 +22,26 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
     tracing::info!("Handler starts");
 
     let context: GetObjectContext = event.payload.get_object_context.unwrap();
+    let user_request = event.payload.user_request;
 
     let route = context.output_route;
     let token = context.output_token;
     let s3_url = context.input_s3_url;
-    let user_request_url = event.payload.user_request.url;
+    let user_request_url = user_request.url;
+    let user_request_header = user_request.headers;
 
+    let accepted_content_type = user_request_header
+        .get("Accept")
+        .and_then(|v| v.to_str().ok())
+        .map(String::from);
     let params = ResizeParams::from_url(&user_request_url).expect("Invalid resize parameters");
 
-    tracing::info!("Route: {}, s3_url: {}", route, s3_url);
+    tracing::info!(
+        "Route: {}, s3_url: {}, user_request_header: {:?}",
+        route,
+        s3_url,
+        user_request_header
+    );
 
     let start = Instant::now();
     let (image, content_type) = client.get_file_url(&s3_url)?;
@@ -70,7 +81,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
     let image_slice = image.as_slice();
     let image_format =
         ImageFormat::from_extension(image_extension.as_str()).expect("Unknown image format");
-    let resized_image_key = get_resized_image_key(&s3_url, &params);
+    let resized_image_key = get_resized_image_key(&s3_url, &params, accepted_content_type.clone());
     let resized_image: Vec<u8>;
 
     tracing::info!("Trying to retrive resized image with key {resized_image_key:?}");
@@ -91,7 +102,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
         Ok((image, ct)) => {
             tracing::info!("Retrieved resized image");
 
-            return client
+            client
                 .send_file(
                     route,
                     token,
@@ -103,10 +114,16 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
         Err(_) => {
             let start = Instant::now();
 
-            resized_image = resize::resize_image(image_slice, params, image_format)
-                .expect("Image resize failed");
+            resized_image = resize::resize_image(
+                image_slice,
+                params,
+                image_format,
+                accepted_content_type.clone().map(ImageFormat::from),
+            )
+            .expect("Image resize failed");
 
-            let resized_image_content_type = content_type.clone().unwrap_or(default_content_type);
+            let resized_image_content_type = accepted_content_type
+                .unwrap_or_else(|| content_type.clone().unwrap_or(default_content_type));
 
             let duration = start.elapsed();
             tracing::info!("Process time: {:?}", duration);
@@ -128,9 +145,9 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
             let (_, send_file_result) =
                 tokio::try_join!(put_file_future, send_file_future).unwrap();
 
-            return Ok(send_file_result);
+            Ok(send_file_result)
         }
-    };
+    }
 }
 
 #[tokio::main]
@@ -144,7 +161,7 @@ async fn main() -> Result<(), Error> {
 
     let func = service_fn(move |event| async move { function_handler(event, client_ref).await });
 
-    let _ = run(func).await?;
+    run(func).await?;
 
     Ok(())
 }

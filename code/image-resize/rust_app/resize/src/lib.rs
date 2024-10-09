@@ -74,13 +74,24 @@ impl ImageFormat {
     }
 }
 
-impl Into<image::ImageFormat> for ImageFormat {
-    fn into(self) -> image::ImageFormat {
-        match self {
+impl From<ImageFormat> for image::ImageFormat {
+    fn from(val: ImageFormat) -> Self {
+        match val {
             ImageFormat::Png => image::ImageFormat::Png,
             ImageFormat::Gif => image::ImageFormat::Gif,
             ImageFormat::Jpeg => image::ImageFormat::Jpeg,
             ImageFormat::Webp => image::ImageFormat::WebP,
+        }
+    }
+}
+
+impl From<String> for ImageFormat {
+    fn from(val: String) -> Self {
+        match val.to_lowercase().as_str() {
+            "png" | "image/png" => Self::Png,
+            "jpg" | "jpeg" | "image/jpeg" => Self::Jpeg,
+            "webp" | "image/webp" => Self::Webp,
+            _ => Self::Jpeg,
         }
     }
 }
@@ -139,31 +150,28 @@ impl ResizeParams {
 }
 
 fn get_png_quality(img_quality: ImageQuality) -> CompressionType {
-    let quality = match img_quality {
+    match img_quality {
         ImageQuality::Low => CompressionType::Default,
         ImageQuality::Medium => CompressionType::Default,
         ImageQuality::High => CompressionType::Fast,
         ImageQuality::Best => CompressionType::Best,
-    };
-
-    quality
+    }
 }
 
 fn get_jpeg_quality(img_quality: ImageQuality) -> u8 {
-    let quality = match img_quality {
+    match img_quality {
         ImageQuality::Low => 25,
         ImageQuality::Medium => 50,
         ImageQuality::High => 75,
         ImageQuality::Best => 100,
-    };
-
-    quality
+    }
 }
 
 pub fn resize_image(
     img_buf: &[u8],
     params: ResizeParams,
     format: ImageFormat,
+    target_format: Option<ImageFormat>,
 ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let start = Instant::now();
     let mut reader = image::ImageReader::new(Cursor::new(img_buf));
@@ -206,13 +214,19 @@ pub fn resize_image(
         TransformMode::Crop => params.h.unwrap_or(CONFIG.default_height),
     };
 
-    match format {
-        ImageFormat::Gif => return resize_multi_pages(img, params.w, img_height, params.t),
-        _ => {
-            return resize_single_page(
-                img, format, params.w, img_height, params.t, params.b, params.q,
-            );
-        }
+    let format_to_use = target_format.unwrap_or(format);
+
+    match format_to_use {
+        ImageFormat::Gif => resize_multi_pages(img, params.w, img_height, params.t),
+        _ => resize_single_page(
+            img,
+            format_to_use,
+            params.w,
+            img_height,
+            params.t,
+            params.b,
+            params.q,
+        ),
     }
 }
 
@@ -289,7 +303,7 @@ fn resize_single_page(
     let duration = start.elapsed();
     tracing::info!("Resize time: {:?}", duration);
 
-    let mut final_image_buf = final_image.buffer_mut();
+    let final_image_buf = final_image.buffer_mut();
 
     let start = Instant::now();
     // Apply blur if specified
@@ -301,11 +315,11 @@ fn resize_single_page(
 
     if blur > 0 {
         libblur::stack_blur(
-            &mut final_image_buf,
+            final_image_buf,
             width * channel_count,
             width,
             height,
-            blur as u32,
+            blur,
             match channel_count {
                 4 => FastBlurChannels::Channels4,
                 _ => FastBlurChannels::Channels3,
@@ -325,15 +339,15 @@ fn resize_single_page(
             get_png_quality(quality),
             FilterType::Adaptive,
         )
-        .write_image(&final_image_buf, width, height, color.into())
+        .write_image(final_image_buf, width, height, color.into())
         .unwrap(),
 
         ImageFormat::Jpeg => JpegEncoder::new_with_quality(&mut buffer, get_jpeg_quality(quality))
-            .write_image(&final_image_buf, width, height, color.into())
+            .write_image(final_image_buf, width, height, color.into())
             .unwrap(),
 
         ImageFormat::Webp => WebPEncoder::new_lossless(&mut buffer)
-            .write_image(&final_image_buf, width, height, color.into())
+            .write_image(final_image_buf, width, height, color.into())
             .unwrap(),
 
         _ => return Err("Unknown format".into()),
