@@ -63,7 +63,7 @@ impl GetFileUrl for S3Client {
     fn get_file_url(&self, url: &str) -> Result<(Vec<u8>, Option<String>), Box<dyn error::Error>> {
         tracing::info!("[S3] Get file url {}", url);
 
-        let resp = match ureq::get(&url).call() {
+        let resp = match ureq::get(url).call() {
             Ok(resp) => resp,
             Err(e) => return Err(e.into()),
         };
