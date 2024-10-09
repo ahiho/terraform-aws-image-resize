@@ -13,7 +13,12 @@ resource "aws_cloudfront_cache_policy" "image_distribution" {
     }
 
     headers_config {
-      header_behavior = "none"
+      header_behavior = "whitelist"
+      headers {
+        items = [
+          "Accept"
+        ]
+      }
     }
 
     query_strings_config {
