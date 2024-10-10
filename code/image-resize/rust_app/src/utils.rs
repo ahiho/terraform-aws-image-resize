@@ -16,6 +16,7 @@ pub struct ImageProcessParams {
     m: String,
     q: String,
     b: u32,
+    a: Option<String>,
 }
 
 pub fn get_file_extension(url_str: &str) -> Option<String> {
@@ -38,7 +39,7 @@ pub fn get_url_path(url_str: &str) -> Option<String> {
     }
 }
 
-pub fn get_resized_image_key(url: &str, params: &ResizeParams) -> String {
+pub fn get_resized_image_key(url: &str, params: &ResizeParams, accept: Option<String>) -> String {
     let path = get_url_path(url).unwrap();
 
     let url_re = Regex::new(r"(.*)\.(.*)").unwrap();
@@ -69,6 +70,7 @@ pub fn get_resized_image_key(url: &str, params: &ResizeParams) -> String {
         m: params.t.to_string(),
         q: params.q.to_string(),
         b: params.b,
+        a: accept
     };
 
     let params_json = serde_json::to_string(&params).expect("Unable to serialize params");
