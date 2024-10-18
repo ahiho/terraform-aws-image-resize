@@ -13,6 +13,7 @@ serde = { workspace = true }
 url = { workspace = true }
 lambda_runtime = { workspace = true }
 lazy_static = { workspace = true }
+infer.workspace = true
 
 async-trait = "0.1.81"
 aws-config = { version = "1.5.5", features = ["behavior-version-latest"] }
@@ -22,7 +23,6 @@ aws_lambda_events = { version = "0.15.1", default-features = false, features = [
   "s3",
 ] }
 
-mime = "0.3.17"
 tokio = { version = "1", features = ["macros"] }
 ureq = "2.10.1"
 regex = "1.10.6"
@@ -34,6 +34,7 @@ lambda_runtime = "0.13.0"
 serde = "1.0.210"
 url = "2.5.2"
 lazy_static = "1.5.0"
+infer = "0.16.0"
 
 [profile.release]
 lto = true

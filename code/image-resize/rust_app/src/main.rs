@@ -43,11 +43,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
         user_request_header
     );
 
-    let start = Instant::now();
     let (image, content_type) = client.get_file_url(&s3_url)?;
-    let duration = start.elapsed();
-    tracing::info!("Image loaded. Length: {}", image.len());
-    tracing::info!("Get file time: {:?}", duration);
 
     if params.o {
         return client
@@ -100,7 +96,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
         .await
     {
         Ok((image, ct)) => {
-            tracing::info!("Retrieved resized image");
+            tracing::info!("Retrieved resized image from s3");
 
             client
                 .send_file(
@@ -122,8 +118,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
             )
             .expect("Image resize failed");
 
-            let resized_image_content_type = accepted_content_type
-                .unwrap_or_else(|| content_type.clone().unwrap_or(default_content_type));
+            let resized_image_content_type = infer::get(&resized_image).map(|t| t.mime_type()).unwrap_or(default_content_type.as_str());
 
             let duration = start.elapsed();
             tracing::info!("Process time: {:?}", duration);
@@ -131,7 +126,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
             let put_file_future = client.put_file(
                 resized_image_key.as_str(),
                 resized_image.clone(),
-                resized_image_content_type.as_str(),
+                resized_image_content_type,
                 &CONFIG.bucket_access_point,
             );
 
@@ -139,7 +134,7 @@ async fn function_handler<T: SendFile + GetFileUrl + GetFile + PutFile>(
                 route,
                 token,
                 resized_image.clone(),
-                resized_image_content_type.as_str(),
+                resized_image_content_type,
             );
 
             let (_, send_file_result) =
